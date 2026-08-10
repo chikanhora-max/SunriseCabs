@@ -1,0 +1,64 @@
+import Link from "next/link";
+
+const reviewStats = [
+  { value: "4.3 / 5", label: "Public rating", note: "Sunrise Rent a Car business listing" },
+  { value: "233", label: "Reviews", note: "Current public business listing" },
+  { value: "20+", label: "Years experience", note: "Public Sunrise Cabs listing" },
+];
+
+export default function ReviewsPage() {
+  return (
+    <main className="min-h-screen bg-[#050505] px-5 py-10 text-white md:px-12">
+      <div className="mx-auto max-w-6xl">
+        <Link href="/" className="text-xs uppercase tracking-[.25em] text-[#ffdd8a]">← SunriseCabs</Link>
+        <header className="py-20 md:py-28">
+          <p className="eyebrow">Trust / public review snapshot</p>
+          <h1 className="display mt-5 max-w-4xl text-6xl leading-[.9] md:text-8xl">Trusted to <span className="sun italic">move Sri Lanka.</span></h1>
+          <p className="mt-8 max-w-2xl text-sm leading-7 text-white/50 md:text-base">SunriseCabs is presented here using publicly available business information. Review figures are a snapshot and can change over time.</p>
+        </header>
+
+        <section className="grid gap-4 md:grid-cols-3">
+          {reviewStats.map((stat) => (
+            <article key={stat.label} className="glass rounded-[2rem] p-7">
+              <p className="text-4xl font-semibold text-[#ffdd8a]">{stat.value}</p>
+              <p className="mt-5 text-sm font-medium">{stat.label}</p>
+              <p className="mt-2 text-xs text-white/35">{stat.note}</p>
+            </article>
+          ))}
+        </section>
+
+        <section className="mt-6 grid gap-6 lg:grid-cols-[1.2fr_.8fr]">
+          <article className="glass rounded-[2rem] p-8 md:p-10">
+            <p className="eyebrow">Publicly listed services</p>
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              {["Airport car hires", "Tourist & holiday travel", "Hotel transfers", "Corporate transport", "VIP & event hires", "Cars, SUVs, vans & coaches"].map((item) => (
+                <div key={item} className="rounded-2xl border border-white/10 bg-white/[.025] p-5 text-sm text-white/75">{item}</div>
+              ))}
+            </div>
+          </article>
+          <article className="rounded-[2rem] border border-[#f4b942]/20 bg-[#f4b942]/[.05] p-8 md:p-10">
+            <p className="eyebrow">Public business details</p>
+            <p className="mt-7 text-sm leading-7 text-white/60">Sunrise Cabs is publicly listed in Kandy and describes a long-running transport operation serving tourists, corporate groups, hotels, airlines, travel agents, institutions and private customers.</p>
+            <div className="mt-8 border-t border-white/10 pt-6">
+              <p className="text-xs text-white/35">Publicly listed phone</p>
+              <a href="tel:+94777810341" className="mt-2 block text-xl font-semibold text-[#ffdd8a]">+94 77 781 0341</a>
+              <p className="mt-4 text-xs text-white/35">Publicly listed Kandy address</p>
+              <p className="mt-2 text-sm">No. 31C, Dharmasoka Mawatha, Kandy</p>
+            </div>
+          </article>
+        </section>
+
+        <section className="mt-6 rounded-[2rem] border border-white/10 bg-white/[.02] p-8 md:p-10">
+          <p className="eyebrow">Review integrity</p>
+          <h2 className="display mt-4 text-4xl md:text-5xl">Good reviews. <span className="sun italic">No invented quotes.</span></h2>
+          <p className="mt-6 max-w-3xl text-sm leading-7 text-white/45">The showcase uses the public rating and review count rather than manufacturing testimonials. Individual customer comments should only be reproduced from the review platform with appropriate attribution.</p>
+        </section>
+
+        <footer className="flex flex-col gap-5 border-t border-white/10 py-10 text-xs text-white/35 md:flex-row md:items-center md:justify-between">
+          <span>SunriseCabs • Kandy, Sri Lanka</span>
+          <Link href="/" className="text-[#ffdd8a]">Return to showcase →</Link>
+        </footer>
+      </div>
+    </main>
+  );
+}
