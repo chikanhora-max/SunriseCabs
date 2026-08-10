@@ -1,5 +1,9 @@
 import type { Metadata, Viewport } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
+const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://sunrise-cabs.vercel.app"),
@@ -13,5 +17,5 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { themeColor: "#f4f4f1", colorScheme: "light", width: "device-width", initialScale: 1 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body>{children}<style>{`body{font-family:"Helvetica Neue","Neue Haas Grotesk Text Pro",Arial,sans-serif}.sunrise-site h1,.sunrise-site h2,.sunrise-site h3,.sunrise-site .manifesto-title,.sunrise-site .footer-title,.sunrise-site .footer-brand,.sunrise-site .journey-row strong,.sunrise-site .estimate-total strong,.sunrise-site .loader-mark{font-family:"Helvetica Neue","Neue Haas Grotesk Text Pro",Arial,sans-serif;font-weight:500;letter-spacing:-.075em}.sunrise-site h1 em,.sunrise-site h2 em,.sunrise-site .manifesto-title em,.sunrise-site .footer-title em,.sunrise-site .loader-mark span{font-style:italic;font-weight:400}.sunrise-site .hero-description,.sunrise-site .manifesto-copy,.sunrise-site .experience-top>p,.sunrise-site .fleet-heading>p,.sunrise-site .journey-intro p,.sunrise-site .estimate-intro p,.sunrise-site .lab-copy p{letter-spacing:-.01em}.sunrise-site .vehicle-3d{contain:layout paint}.sunrise-site button,.sunrise-site a{touch-action:manipulation}`}</style></body></html>;
+  return <html lang="en" className={`${geist.variable} ${geistMono.variable}`}><body>{children}</body></html>;
 }
