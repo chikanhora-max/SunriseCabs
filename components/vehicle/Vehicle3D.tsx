@@ -2,10 +2,11 @@
 
 import { Canvas, useFrame } from '@react-three/fiber';
 import { ContactShadows, Environment, OrbitControls, RoundedBox } from '@react-three/drei';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import * as THREE from 'three';
 
 type VehicleKind = 'hatch' | 'suv' | 'van' | 'sedan';
+let instanceSequence = 0;
 
 function Body({ kind }: { kind: VehicleKind }) {
   const group = useRef<THREE.Group>(null);
@@ -31,7 +32,16 @@ function Body({ kind }: { kind: VehicleKind }) {
   </group>;
 }
 
+function FleetFallback({ kind }: { kind: VehicleKind }) {
+  const widths = { hatch: '72%', suv: '82%', sedan: '78%', van: '88%' };
+  return <div className="fleet-3d-fallback" aria-label={`${kind} vehicle visual`}><div className="fallback-car" style={{ width: widths[kind] }}><span/><i/><b/></div><div className="fallback-shadow"/></div>;
+}
+
 export default function Vehicle3D({ kind = 'hatch' }: { kind?: VehicleKind }) {
+  const [slot] = useState(() => instanceSequence++);
+  // The homepage contains a hero, garage and eight fleet cards. Keeping only two live
+  // WebGL contexts prevents browser context exhaustion while preserving real 3D where it matters.
+  if (slot > 1) return <div className="vehicle-3d" aria-label="Vehicle preview"><FleetFallback kind={kind}/></div>;
   return <div className="vehicle-3d" aria-label="Interactive 3D vehicle showcase">
     <Canvas dpr={[1, 1.5]} camera={{ position: [5.4, 2.55, 6.4], fov: 34 }} gl={{ antialias: true, powerPreference: 'high-performance', alpha: false }}>
       <color attach="background" args={['#f7f7f5']}/>
