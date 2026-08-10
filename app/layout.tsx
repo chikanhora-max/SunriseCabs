@@ -11,5 +11,5 @@ export const metadata: Metadata = {
 };
 export const viewport: Viewport = { themeColor: "#030303", colorScheme: "dark", width: "device-width", initialScale: 1 };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body>{children}</body></html>;
+  return <html lang="en"><body>{children}<div className="fixed bottom-5 right-5 z-[90] flex items-center gap-2"><a href="https://wa.me/94776380753" target="_blank" rel="noreferrer" aria-label="WhatsApp Sunrise Cabs" className="grid h-14 w-14 place-items-center rounded-full border border-[#25D366]/40 bg-[#25D366] text-xl text-black shadow-[0_0_40px_rgba(37,211,102,.22)] transition hover:scale-110">☘</a><a href="/tools" aria-label="Open Sunrise Cabs trip tools" className="grid h-12 w-12 place-items-center rounded-full border border-[#f4b942]/30 bg-black/70 text-[#ffdd8a] backdrop-blur-xl transition hover:scale-110">✦</a></div></body></html>;
 }
