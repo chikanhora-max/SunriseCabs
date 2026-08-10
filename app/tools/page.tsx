@@ -1,0 +1,54 @@
+"use client";
+import { useMemo, useState } from "react";
+import Link from "next/link";
+
+const whatsappNumber = "94776380753";
+const fleet = {
+  "Wagon R FZ": { day: 8000, twoHundred: 9500, seats: 4, bags: 2, extraKm: 40, extraHour: 300, deposit: 25000 },
+  "Honda Vezel": { day: 11000, twoHundred: 13500, seats: 4, bags: 2, extraKm: 80, extraHour: 500, deposit: 60000 },
+  "Toyota KDH": { day: null, twoHundred: null, seats: 10, bags: 5, extraKm: null, extraHour: null, deposit: null },
+  "DFSK Glory": { day: null, twoHundred: null, seats: 7, bags: 3, extraKm: null, extraHour: null, deposit: null },
+} as const;
+
+export default function ToolsPage() {
+  const [vehicle, setVehicle] = useState<keyof typeof fleet>("Wagon R FZ");
+  const [days, setDays] = useState(3);
+  const [packageKm, setPackageKm] = useState<100 | 200>(100);
+  const [extraKm, setExtraKm] = useState(0);
+  const [extraHours, setExtraHours] = useState(0);
+  const [guests, setGuests] = useState(2);
+  const [route, setRoute] = useState("Kandy → Ella → Galle");
+
+  const car = fleet[vehicle];
+  const base = car.day ? (days >= 30 ? 6000 : days >= 20 ? 6750 : days >= 10 ? 7500 : packageKm === 200 ? car.twoHundred! : car.day) * days : null;
+  const estimate = base === null ? null : base + extraKm * car.extraKm! + extraHours * car.extraHour!;
+  const luggageFit = guests <= car.seats && Math.ceil(guests / 2) <= car.bags;
+  const message = useMemo(() => `Hello Sunrise Cabs! I'd like a rental quote. Vehicle: ${vehicle}. Duration: ${days} day(s). Mileage package: ${packageKm} km/day. Extra km: ${extraKm}. Extra hours: ${extraHours}. Guests: ${guests}. Route: ${route}. Please confirm live availability, final price, deposit and terms.`, [vehicle, days, packageKm, extraKm, extraHours, guests, route]);
+  const whatsapp = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+
+  return <main className="min-h-screen bg-[#030303] px-5 py-10 text-white md:px-12">
+    <div className="mx-auto max-w-6xl">
+      <Link href="/" className="text-xs uppercase tracking-[.25em] text-[#ffdd8a]">← SunriseCabs</Link>
+      <header className="py-20 md:py-28"><p className="eyebrow">Smart tools / quote studio</p><h1 className="display mt-5 text-6xl leading-[.9] md:text-8xl">Plan the <span className="sun italic">drive.</span></h1><p className="mt-8 max-w-2xl text-sm leading-7 text-white/50">Useful trip tools built around published Sunrise rental data. Nothing here claims live availability; the final quote is confirmed directly with Sunrise.</p></header>
+      <section className="grid gap-6 lg:grid-cols-[1.1fr_.9fr]">
+        <div className="glass rounded-[2rem] p-7 md:p-9">
+          <p className="eyebrow">01 / Smart rental configurator</p>
+          <div className="mt-8 grid gap-5 sm:grid-cols-2">
+            <label className="text-xs text-white/45">Vehicle<select value={vehicle} onChange={e=>setVehicle(e.target.value as keyof typeof fleet)} className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 p-4 text-white"><option>Wagon R FZ</option><option>Honda Vezel</option><option>Toyota KDH</option><option>DFSK Glory</option></select></label>
+            <label className="text-xs text-white/45">Days<input type="number" min={1} max={90} value={days} onChange={e=>setDays(Math.max(1, Number(e.target.value)||1))} className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 p-4 text-white"/></label>
+            <label className="text-xs text-white/45">Mileage package<select value={packageKm} onChange={e=>setPackageKm(Number(e.target.value) as 100|200)} className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 p-4 text-white"><option value={100}>100 km / day</option><option value={200}>200 km / day</option></select></label>
+            <label className="text-xs text-white/45">Guests<input type="number" min={1} max={20} value={guests} onChange={e=>setGuests(Math.max(1, Number(e.target.value)||1))} className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 p-4 text-white"/></label>
+            <label className="text-xs text-white/45">Extra kilometres<input type="number" min={0} value={extraKm} onChange={e=>setExtraKm(Math.max(0, Number(e.target.value)||0))} className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 p-4 text-white"/></label>
+            <label className="text-xs text-white/45">Extra hours<input type="number" min={0} value={extraHours} onChange={e=>setExtraHours(Math.max(0, Number(e.target.value)||0))} className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 p-4 text-white"/></label>
+          </div>
+          <label className="mt-5 block text-xs text-white/45">Trip route<input value={route} onChange={e=>setRoute(e.target.value)} className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 p-4 text-white"/></label>
+        </div>
+        <aside className="rounded-[2rem] border border-[#f4b942]/20 bg-[#f4b942]/[.055] p-7 md:p-9"><p className="eyebrow">Live estimate</p><p className="mt-8 text-5xl font-semibold text-[#ffe09a]">{estimate===null?"Quote":`Rs. ${estimate.toLocaleString("en-LK")}`}</p><p className="mt-2 text-xs text-white/35">{estimate===null?"Sunrise confirmation required":"estimate only • before final confirmation"}</p><div className="mt-8 space-y-3 border-t border-white/10 pt-6 text-sm"><div className="flex justify-between"><span className="text-white/45">Capacity</span><span>{car.seats} seats • {car.bags} bags</span></div><div className="flex justify-between"><span className="text-white/45">Deposit</span><span>{car.deposit?`Rs. ${car.deposit.toLocaleString("en-LK")}`:"Quote required"}</span></div><div className="flex justify-between"><span className="text-white/45">Luggage fit</span><span>{luggageFit?"Looks suitable":"Ask Sunrise"}</span></div></div><a href={whatsapp} target="_blank" rel="noreferrer" className="mt-8 block rounded-full bg-[#25D366] px-6 py-4 text-center text-xs font-bold uppercase tracking-widest text-black">Send this quote on WhatsApp</a></aside>
+      </section>
+      <section className="mt-6 grid gap-4 md:grid-cols-3">
+        {[['Trip planner','Build a route, then ask Sunrise to confirm the right vehicle and availability.'],['Luggage check','Quickly compare passengers and bags before you request a quote.'],['Transparent pricing','Only published Wagon R/Vezel figures are calculated; unverified vehicles stay quote-first.']].map(([t,d])=><article key={t} className="glass rounded-3xl p-7"><p className="eyebrow">Useful</p><h2 className="mt-8 text-xl font-semibold">{t}</h2><p className="mt-2 text-sm leading-6 text-white/40">{d}</p></article>)}
+      </section>
+      <footer className="mt-16 border-t border-white/10 py-10 text-xs text-white/35"><Link href="/" className="text-[#ffdd8a]">Return to showcase →</Link></footer>
+    </div>
+  </main>;
+}
