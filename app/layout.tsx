@@ -3,13 +3,13 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://sunrise-cabs.vercel.app"),
-  title: { default: "SunriseCabs — Sri Lanka, Your Way", template: "%s — SunriseCabs" },
-  description: "Premium self-drive cars, chauffeur transfers and island-wide rentals across Sri Lanka.",
-  keywords: ["Sri Lanka car rental","Wagon R rental","KDH rental","DFSK Glory rental","Colombo airport car rental","self drive Sri Lanka"],
-  openGraph: { title: "SunriseCabs", description: "Sri Lanka, your way.", type: "website", siteName: "SunriseCabs" },
+  title: { default: "SunriseCabs — Kandy, Sri Lanka", template: "%s — SunriseCabs" },
+  description: "A premium Kandy car-rental and transportation showcase with verified public Sunrise Cabs information, fleet references, rental estimates and direct contact routes.",
+  keywords: ["Sunrise Cabs Kandy","Sunrise Rent a Car Kandy","Sri Lanka car rental","Kandy car rental","Wagon R rental Sri Lanka","KDH rental Kandy","DFSK Glory rental Sri Lanka","Colombo airport car rental","self drive Sri Lanka"],
+  openGraph: { title: "SunriseCabs — Kandy, Sri Lanka", description: "Premium mobility across Sri Lanka, built around publicly verifiable Sunrise Cabs information.", type: "website", siteName: "SunriseCabs" },
   robots: { index: true, follow: true },
 };
-export const viewport: Viewport = { themeColor: "#050505", colorScheme: "dark", width: "device-width", initialScale: 1 };
+export const viewport: Viewport = { themeColor: "#030303", colorScheme: "dark", width: "device-width", initialScale: 1 };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return <html lang="en"><body>{children}</body></html>;
 }
