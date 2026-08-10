@@ -1,74 +1,18 @@
 'use client';
-
-import { Canvas } from '@react-three/fiber';
-import { ContactShadows, Environment, OrbitControls, useGLTF } from '@react-three/drei';
-import { Suspense, useEffect, useMemo, useRef } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { ContactShadows, Environment, OrbitControls } from '@react-three/drei';
+import { useRef } from 'react';
 import * as THREE from 'three';
-
 type VehicleKind = 'hatch' | 'suv' | 'van' | 'sedan';
-let instanceSequence = 0;
-
-// A real GLB concept-car asset is used for the studio stage rather than primitive boxes.
-// It is intentionally labelled as a concept visualization in the UI, not as an exact Sunrise fleet vehicle.
-const CONCEPT_CAR = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/CarConcept/glTF-Binary/CarConcept.glb';
-
-function Model({ kind }: { kind: VehicleKind }) {
-  const { scene } = useGLTF(CONCEPT_CAR);
-  const root = useRef<THREE.Group>(null);
-  const clone = useMemo(() => scene.clone(true), [scene]);
-
-  useEffect(() => {
-    const box = new THREE.Box3().setFromObject(clone);
-    const size = box.getSize(new THREE.Vector3());
-    const center = box.getCenter(new THREE.Vector3());
-    const target = kind === 'van' ? 4.7 : kind === 'suv' ? 4.4 : kind === 'sedan' ? 4.5 : 4.1;
-    const scale = target / Math.max(size.x, size.z);
-    clone.scale.setScalar(scale);
-    clone.position.set(-center.x * scale, -box.min.y * scale, -center.z * scale);
-    clone.traverse((obj) => {
-      const mesh = obj as THREE.Mesh;
-      if (!mesh.isMesh) return;
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-      const material = mesh.material as THREE.MeshStandardMaterial;
-      if (material?.isMeshStandardMaterial) {
-        material.roughness = Math.min(material.roughness ?? 0.35, 0.32);
-        material.metalness = Math.max(material.metalness ?? 0.25, 0.35);
-      }
-    });
-  }, [clone, kind]);
-
-  return <group ref={root} rotation={[0, -0.42, 0]} position={[0, 0.02, 0]}><primitive object={clone} /></group>;
+function RentalVehicle({ kind }: { kind: VehicleKind }) {
+ const group=useRef<THREE.Group>(null); const body: [number,number,number]=kind==='van'?[2.65,.82,1.18]:kind==='suv'?[2.45,.72,1.14]:kind==='sedan'?[2.7,.6,1.08]:[2.3,.62,1.04]; const cabin: [number,number,number]=kind==='van'?[1.72,.62,1.04]:kind==='suv'?[1.62,.58,1]:kind==='sedan'?[1.75,.5,.94]:[1.5,.52,.9];
+ useFrame((_,d)=>{if(group.current)group.current.rotation.y+=d*.16}); return <group ref={group} position={[0,.62,0]}>
+  <mesh castShadow receiveShadow><boxGeometry args={body}/><meshStandardMaterial color="#d9d9d5" metalness={.62} roughness={.24}/></mesh>
+  <mesh castShadow position={[.1,.62,0]}><boxGeometry args={cabin}/><meshStandardMaterial color="#202124" metalness={.25} roughness={.16}/></mesh>
+  <mesh position={[.1,.62,.525]}><boxGeometry args={[cabin[0]*.78,cabin[1]*.66,.018]}/><meshStandardMaterial color="#cfd8dc" roughness={.08} transparent opacity={.72}/></mesh>
+  {[-1,1].flatMap(side=>[-1,1].map(axle=><mesh key={`${side}-${axle}`} castShadow rotation={[Math.PI/2,0,0]} position={[axle*(body[0]/2-.38),-.45,side*(body[2]/2+.02)]}><cylinderGeometry args={[.34,.34,.16,32]}/><meshStandardMaterial color="#111" metalness={.72} roughness={.2}/></mesh>))}
+  <mesh position={[body[0]/2+.02,-.03,0]}><boxGeometry args={[.05,.18,body[2]*.55]}/><meshStandardMaterial color="#f5f5f5" emissive="#fff" emissiveIntensity={1.5}/></mesh>
+  <mesh position={[-body[0]/2-.02,-.03,0]}><boxGeometry args={[.05,.16,body[2]*.45]}/><meshStandardMaterial color="#6d1010" emissive="#3a0000" emissiveIntensity={.7}/></mesh>
+ </group>;
 }
-
-function StudioModel({ kind }: { kind: VehicleKind }) {
-  const ref = useRef<THREE.Group>(null);
-  return <group ref={ref}><Model kind={kind} /></group>;
-}
-
-function Fallback({ kind }: { kind: VehicleKind }) {
-  return <div className="fleet-3d-fallback" aria-label={`${kind} vehicle concept preview`}><div className="fallback-car"/><div className="fallback-shadow"/><span className="fallback-label">3D CONCEPT</span></div>;
-}
-
-function Scene({ kind }: { kind: VehicleKind }) {
-  return <Canvas dpr={[1, 1.5]} camera={{ position: [5.5, 2.45, 6.5], fov: 33 }} gl={{ antialias: true, powerPreference: 'high-performance', alpha: false }} shadows>
-    <color attach="background" args={['#f6f6f3']} />
-    <ambientLight intensity={1.25} />
-    <hemisphereLight args={['#ffffff', '#d2d2cc', 1.25]} />
-    <directionalLight position={[4, 6, 5]} intensity={4.8} castShadow shadow-mapSize={[1024, 1024]} />
-    <directionalLight position={[-4, 3, -3]} intensity={2.2} />
-    <spotLight position={[0, 6, 4]} angle={0.55} penumbra={0.9} intensity={4.5} />
-    <Suspense fallback={null}><StudioModel kind={kind} /></Suspense>
-    <ContactShadows position={[0, 0.01, 0]} opacity={0.28} scale={7} blur={2.6} far={6} />
-    <Environment preset="studio" />
-    <OrbitControls enablePan={false} minDistance={4.7} maxDistance={8.5} minPolarAngle={Math.PI / 3.1} maxPolarAngle={Math.PI / 2.05} autoRotate autoRotateSpeed={0.48} enableDamping dampingFactor={0.08} />
-  </Canvas>;
-}
-
-export default function Vehicle3D({ kind = 'hatch' }: { kind?: VehicleKind }) {
-  const [slot] = useRef([instanceSequence++]).current;
-  if (slot > 1) return <div className="vehicle-3d" aria-label="Vehicle preview"><Fallback kind={kind} /></div>;
-  return <div className="vehicle-3d" aria-label="Interactive 3D vehicle concept showcase"><Scene kind={kind} /></div>;
-}
-
-useGLTF.preload(CONCEPT_CAR);
+export default function Vehicle3D({kind='hatch'}:{kind?:VehicleKind}){return <div className="vehicle-3d" aria-label={`${kind} rental vehicle 3D visualization`}><Canvas dpr={[1,1.35]} camera={{position:[4.8,2.25,5.8],fov:35}} gl={{antialias:true,powerPreference:'high-performance',alpha:false}} shadows><color attach="background" args={['#f7f7f4']}/><ambientLight intensity={1.2}/><hemisphereLight args={['#fff','#c9c9c4',1.1]}/><directionalLight position={[4,6,5]} intensity={3.4} castShadow shadow-mapSize={[512,512]}/><directionalLight position={[-4,2,-3]} intensity={1.8}/><RentalVehicle kind={kind}/><ContactShadows position={[0,.02,0]} opacity={.3} scale={6} blur={2.4} far={6}/><Environment preset="studio"/><OrbitControls enablePan={false} minDistance={4.4} maxDistance={7.8} minPolarAngle={Math.PI/3.2} maxPolarAngle={Math.PI/2.03} enableDamping dampingFactor={.08}/></Canvas></div>}
